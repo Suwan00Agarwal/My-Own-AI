@@ -12,6 +12,7 @@
 #include <set>
 #include <sstream>
 #include <iomanip>
+#include <cstdlib>
 #include <functional>
 #include <fstream>
 #include <climits>
@@ -773,7 +774,13 @@ int main() {
     // Check Ollama at startup (non-fatal)
     bool ollamaUp = ollama.isAvailable();
     std::cout << "=== VectorDB Engine ===" << std::endl;
-    std::cout << "http://localhost:8080" << std::endl;
+    int port = 8080;
+
+    if (const char* envPort = std::getenv("PORT")) {
+        port = std::stoi(envPort);
+    }
+
+    std::cout << "http://localhost:" << port << std::endl;
     std::cout << db.size() << " demo vectors | " << DIMS << " dims | HNSW+KD-Tree+BruteForce" << std::endl;
     std::cout << "Ollama: " << (ollamaUp ? "ONLINE" : "OFFLINE (install from ollama.com)") << std::endl;
     if (ollamaUp) std::cout << "  embed model: " << ollama.embedModel
@@ -1084,6 +1091,6 @@ int main() {
             "text/html");
     });
 
-    svr.listen("0.0.0.0", 8080);
+    svr.listen("0.0.0.0", port);
     return 0;
 }
